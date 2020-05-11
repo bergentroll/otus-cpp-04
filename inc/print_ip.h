@@ -6,7 +6,6 @@
 #include <list>
 #include <tuple>
 
-/// @todo Use everywhere.
 std::string to_string(std::string const &s) {
   return s;
 }
@@ -53,13 +52,11 @@ void print_ip(T t) {
   std::cout << std::endl;
 }
 
-template <typename T, typename Alloc>
-void print_ip(std::vector<T, Alloc> const &t) {
-  print_container(t);
-}
-
-template <typename T, typename Alloc>
-void print_ip(std::list<T, Alloc> const &t) {
+template <
+  template<typename, typename> typename Container,
+  typename T, 
+  typename Alloc>
+void print_ip(Container<T, Alloc> const &t) {
   print_container(t);
 }
 
@@ -67,14 +64,18 @@ void print_ip(std::string s) {
   std::cout << s << std::endl;
 }
 
-template <typename T>
-void print_ip(std::tuple<T> const &t) {
-  std::cout << to_string(std::get<0>(t)) << std::endl;
+template <typename T1, typename T2>
+void print_ip(std::tuple<T1, T2> const &t) {
+  static_assert(std::is_same<T1, T2>());
+  std::cout
+    << to_string(std::get<0>(t)) << '.'
+    << to_string(std::get<1>(t)) << std::endl;
 }
 
 template <typename Head, typename ... Tail>
 void print_ip(std::tuple<Head, Tail ...> const &t) {
-  static_assert(std::is_same<Head, typename std::tuple_element<0, std::tuple<Tail ...> >::type>());
+  using Second = typename std::tuple_element<0, std::tuple<Tail ...> >::type;
+  static_assert(std::is_same<Head, Second>());
   std::cout << to_string(std::get<0>(t)) << '.';
   std::apply(
     [](auto head, auto ... tail) {
