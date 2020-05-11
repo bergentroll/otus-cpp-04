@@ -49,9 +49,23 @@ void print_ip(std::string s) {
   std::cout << s << std::endl;
 }
 
-//template <typename T, typename Alloc>
-//void print_ip(std::list<T, Alloc> const &t) {
-//  print_container(t);
-//}
+template <typename T>
+void print_ip(std::tuple<T, T, T, T> const &t) {
+  auto [a, b, c, d] { t };
+  std::cout
+    << std::to_string(a) << '.'
+    << std::to_string(b) << '.'
+    << std::to_string(c) << '.'
+    << std::to_string(d) << std::endl;
+}
+
+void print_ip(std::tuple<std::string, std::string, std::string, std::string> const &t) {
+  auto [a, b, c, d] { t };
+  std::cout
+    << a << '.'
+    << b << '.'
+    << c << '.'
+    << d << std::endl;
+}
 
 #endif

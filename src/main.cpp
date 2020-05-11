@@ -13,7 +13,12 @@ int main(int argc, char **argv) {
   std::string s { "127.0.0.1" };
   std::vector<int> v { 192, 168, 0, 1 };
   std::list<char> lst { 10, 8, 0, 1 };
-  std::tuple<int, std::string, char, size_t> tup { 172, "16", 10, 255 };
+  std::tuple<size_t, size_t, size_t, size_t> tup_i { 172, 16, 10, 255 };
+  std::tuple<
+    std::string,
+    std::string,
+    std::string,
+    std::string> tup_s { "45", "12", "19", "27" };
 
   print_ip(ch);
   print_ip(sh);
@@ -22,6 +27,8 @@ int main(int argc, char **argv) {
   print_ip(s);
   print_ip(v);
   print_ip(lst);
-  //print_ip(tup);
+  print_ip(tup_i);
+  print_ip(tup_s);
+
   return EXIT_SUCCESS;
 }
