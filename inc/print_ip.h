@@ -14,17 +14,25 @@ void print_container(T const &t) {
     if (it != begin) std::cout << '.';
     std::cout << static_cast<int>(*it);
   }
-  //auto size { t.size() };
-  //for (size_t i { }; i < t.size(); i++) {
-  //  std::cout << t[i];
-  //  if (i < size - 1) std::cout << '.';
-  //}
   std::cout << std::endl;
 }
 
 template <typename T>
-void print_ip(T const &t) {
-  std::cerr << "Unable to print type " << typeid(t).name() << std::endl;
+void print_ip(T t) {
+  constexpr size_t type_size { sizeof(T) };
+
+  union {
+    unsigned char bytes[type_size];
+    T value;
+  };
+
+  value = t;
+
+  for (int i { type_size - 1 }; i >= 0; i--) {
+    std::cout << std::to_string(static_cast<unsigned char>(bytes[i]));
+    if (i != 0) std::cout << '.';
+  }
+  std::cout << std::endl;
 }
 
 template <typename T, typename Alloc>
@@ -37,13 +45,13 @@ void print_ip(std::list<T, Alloc> const &t) {
   print_container(t);
 }
 
+void print_ip(std::string s) {
+  std::cout << s << std::endl;
+}
+
 //template <typename T, typename Alloc>
 //void print_ip(std::list<T, Alloc> const &t) {
 //  print_container(t);
 //}
-
-void print_ip(std::string s) {
-  std::cout << s << std::endl;
-}
 
 #endif

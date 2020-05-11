@@ -22,6 +22,6 @@ int main(int argc, char **argv) {
   print_ip(s);
   print_ip(v);
   print_ip(lst);
-  print_ip(tup);
+  //print_ip(tup);
   return EXIT_SUCCESS;
 }
