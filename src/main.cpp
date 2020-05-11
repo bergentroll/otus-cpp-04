@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
   short sh { 0 };
   int i { 2130706433 };
   long l { 8875824491850138409 };
-  std::string s { "127.0.0.1" };
+  std::string s { "localhost" };
   std::vector<int> v { 192, 168, 0, 1 };
   std::list<char> lst { 10, 8, 0, 1 };
   std::tuple<size_t, size_t, size_t, size_t> tup_i { 172, 16, 10, 255 };

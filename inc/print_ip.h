@@ -50,22 +50,32 @@ void print_ip(std::string s) {
 }
 
 template <typename T>
-void print_ip(std::tuple<T, T, T, T> const &t) {
-  auto [a, b, c, d] { t };
-  std::cout
-    << std::to_string(a) << '.'
-    << std::to_string(b) << '.'
-    << std::to_string(c) << '.'
-    << std::to_string(d) << std::endl;
+std::string to_string(T t) {
+  return std::to_string(t);
 }
 
-void print_ip(std::tuple<std::string, std::string, std::string, std::string> const &t) {
-  auto [a, b, c, d] { t };
-  std::cout
-    << a << '.'
-    << b << '.'
-    << c << '.'
-    << d << std::endl;
+/// @todo Use everywhere.
+std::string to_string(std::string const &s) {
+  return s;
+}
+
+std::string to_string(char ch) {
+  return to_string(static_cast<unsigned char>(ch));
+}
+
+template <typename T>
+void print_ip(std::tuple<T> const &t) {
+  std::cout << to_string(std::get<0>(t)) << std::endl;
+}
+
+template <typename Head, typename ... Tail>
+void print_ip(std::tuple<Head, Tail ...> const &t) {
+  static_assert(std::is_same<Head, typename std::tuple_element<0, std::tuple<Tail ...> >::type>());
+  std::cout << to_string(std::get<0>(t)) << '.';
+  std::apply(
+    [](auto head, auto ... tail) {
+      print_ip(std::make_tuple(tail...));
+    }, t);
 }
 
 #endif
