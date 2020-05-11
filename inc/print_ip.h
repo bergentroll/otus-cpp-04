@@ -6,13 +6,31 @@
 #include <list>
 #include <tuple>
 
+/// @todo Use everywhere.
+std::string to_string(std::string const &s) {
+  return s;
+}
+
+template <typename T>
+std::string to_string(T t) {
+  return std::to_string(t);
+}
+
+std::string to_string(char ch) {
+  return to_string(static_cast<unsigned char>(ch));
+}
+
+std::string to_string(const char *ch) {
+  return std::string(ch);
+}
+
 template <typename T>
 void print_container(T const &t) {
   auto begin { t.cbegin() };
   auto end { t.cend() };
   for (auto it { begin }; it != end; it++) {
     if (it != begin) std::cout << '.';
-    std::cout << static_cast<int>(*it);
+    std::cout << to_string(*it);
   }
   std::cout << std::endl;
 }
@@ -29,7 +47,7 @@ void print_ip(T t) {
   value = t;
 
   for (int i { type_size - 1 }; i >= 0; i--) {
-    std::cout << std::to_string(static_cast<unsigned char>(bytes[i]));
+    std::cout << to_string(bytes[i]);
     if (i != 0) std::cout << '.';
   }
   std::cout << std::endl;
@@ -47,20 +65,6 @@ void print_ip(std::list<T, Alloc> const &t) {
 
 void print_ip(std::string s) {
   std::cout << s << std::endl;
-}
-
-template <typename T>
-std::string to_string(T t) {
-  return std::to_string(t);
-}
-
-/// @todo Use everywhere.
-std::string to_string(std::string const &s) {
-  return s;
-}
-
-std::string to_string(char ch) {
-  return to_string(static_cast<unsigned char>(ch));
 }
 
 template <typename T>

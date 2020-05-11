@@ -13,12 +13,8 @@ int main(int argc, char **argv) {
   std::string s { "localhost" };
   std::vector<int> v { 192, 168, 0, 1 };
   std::list<char> lst { 10, 8, 0, 1 };
-  std::tuple<size_t, size_t, size_t, size_t> tup_i { 172, 16, 10, 255 };
-  std::tuple<
-    std::string,
-    std::string,
-    std::string,
-    std::string> tup_s { "45", "12", "19", "27" };
+  auto tup_i = std::make_tuple(45, 12, 19, 27);
+  auto tup_s = std::make_tuple("2001", "db8", "0000", "1", "1", "1", "1", "1");
 
   print_ip(ch);
   print_ip(sh);
