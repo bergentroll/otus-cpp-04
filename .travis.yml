@@ -1,0 +1,25 @@
+language: cpp
+dist: bionic
+
+env:
+  - BUILD_TYPE=Release
+
+addons:
+  apt:
+    update: false
+    packages:
+    - libgtest-dev
+
+script:
+- set -e
+- cmake --DCMAKE_BUILD_TYPE=${BUILD_TYPE} .
+- cmake --build .
+- cmake --build . --target test
+- cmake --build . --target package
+
+deploy:
+  provider: bintray
+  file: bintray.json
+  user: bergentroll
+  cleanup: false
+  edge: true
