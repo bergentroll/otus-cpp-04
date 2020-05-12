@@ -33,6 +33,30 @@ else()
     "${GTEST_SRCDIR}.")
 endif()
 
+# Attribution https://stackoverflow.com/a/30191576/7486328
+add_executable(test_static_assert_1 ${TEST_PATH}/test_static_asserts.cpp)
+add_executable(test_static_assert_2 ${TEST_PATH}/test_static_asserts.cpp)
+set_target_properties(
+  test_static_assert_1 test_static_assert_2
+  PROPERTIES
+  EXCLUDE_FROM_ALL TRUE
+  EXCLUDE_FROM_DEFAULT_BUILD TRUE)
+target_compile_definitions(test_static_assert_1 PRIVATE TEST1)
+target_compile_definitions(test_static_assert_2 PRIVATE TEST2)
+add_test(
+  NAME test_static_assert_1
+  COMMAND ${CMAKE_COMMAND} --build . --target test_static_assert_1
+    --config $<CONFIGURATION>
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_test(
+  NAME test_static_assert_2
+  COMMAND ${CMAKE_COMMAND} --build . --target test_static_assert_2
+    --config $<CONFIGURATION>
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(
+  test_static_assert_1 test_static_assert_2
+  PROPERTIES WILL_FAIL TRUE)
+
 enable_testing()
 
 install(TARGETS print_ip RUNTIME DESTINATION bin)
