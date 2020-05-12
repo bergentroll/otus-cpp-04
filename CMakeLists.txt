@@ -17,23 +17,23 @@ include_directories("inc/")
 
 add_executable(print_ip ${SRC_PATH}/main.cpp)
 
-#if(EXISTS "${GTEST_SRCDIR}/CMakeLists.txt")
-#  add_subdirectory(${GTEST_SRCDIR}/ ${CMAKE_BINARY_DIR}/gtest/ EXCLUDE_FROM_ALL)
-#
-#  add_executable(test_suite ${TEST_PATH}/test.cpp)
-#  target_link_libraries(
-#    test_suite
-#    PRIVATE
-#    gtest)
-#  add_test(test_suite test_suite)
-#else()
-#  message(
-#    WARNING
-#    "Test suite will not be launched because GTest sources is not found at "
-#    "${GTEST_SRCDIR}.")
-#endif()
-#
-#enable_testing()
+if(EXISTS "${GTEST_SRCDIR}/CMakeLists.txt")
+  add_subdirectory(${GTEST_SRCDIR}/ ${CMAKE_BINARY_DIR}/gtest/ EXCLUDE_FROM_ALL)
+
+  add_executable(test_suite ${TEST_PATH}/test.cpp)
+  target_link_libraries(
+    test_suite
+    PRIVATE
+    gtest)
+  add_test(test_suite test_suite)
+else()
+  message(
+    WARNING
+    "Test suite will not be launched because GTest sources is not found at "
+    "${GTEST_SRCDIR}.")
+endif()
+
+enable_testing()
 
 install(TARGETS print_ip RUNTIME DESTINATION bin)
 

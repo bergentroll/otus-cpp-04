@@ -24,18 +24,7 @@ std::string to_string(const char *ch) {
 }
 
 template <typename T>
-void print_container(T const &t) {
-  auto begin { t.cbegin() };
-  auto end { t.cend() };
-  for (auto it { begin }; it != end; it++) {
-    if (it != begin) std::cout << '.';
-    std::cout << to_string(*it);
-  }
-  std::cout << std::endl;
-}
-
-template <typename T>
-void print_ip(T t) {
+void print_ip(T t, std::ostream &stream = std::cout) {
   constexpr size_t type_size { sizeof(T) };
 
   union {
@@ -46,41 +35,51 @@ void print_ip(T t) {
   value = t;
 
   for (int i { type_size - 1 }; i >= 0; i--) {
-    std::cout << to_string(bytes[i]);
-    if (i != 0) std::cout << '.';
+    stream << to_string(bytes[i]);
+    if (i != 0) stream << '.';
   }
-  std::cout << std::endl;
+  stream << std::endl;
 }
 
 template <
   template<typename, typename> typename Container,
   typename T, 
   typename Alloc>
-void print_ip(Container<T, Alloc> const &t) {
-  print_container(t);
-}
-
-void print_ip(std::string s) {
-  std::cout << s << std::endl;
+void print_ip(Container<T, Alloc> const &t, std::ostream &stream = std::cout) {
+  auto begin { t.cbegin() };
+  auto end { t.cend() };
+  for (auto it { begin }; it != end; it++) {
+    if (it != begin) stream << '.';
+    stream << to_string(*it);
+  }
+  stream << std::endl;
 }
 
 template <typename T1, typename T2>
-void print_ip(std::tuple<T1, T2> const &t) {
+void print_ip(std::tuple<T1, T2> const &t, std::ostream &stream = std::cout) {
   static_assert(std::is_same<T1, T2>());
-  std::cout
+  stream
     << to_string(std::get<0>(t)) << '.'
     << to_string(std::get<1>(t)) << std::endl;
 }
 
 template <typename Head, typename ... Tail>
-void print_ip(std::tuple<Head, Tail ...> const &t) {
+void print_ip(std::tuple<Head, Tail ...> const &t, std::ostream &stream = std::cout) {
   using Second = typename std::tuple_element<0, std::tuple<Tail ...> >::type;
   static_assert(std::is_same<Head, Second>());
-  std::cout << to_string(std::get<0>(t)) << '.';
+  stream << to_string(std::get<0>(t)) << '.';
   std::apply(
-    [](auto head, auto ... tail) {
-      print_ip(std::make_tuple(tail...));
+    [&stream](auto head, auto ... tail) {
+      print_ip(std::make_tuple(tail...), stream);
     }, t);
+}
+
+void print_ip(std::string s, std::ostream &stream = std::cout) {
+  stream << s << std::endl;
+}
+
+void print_ip(char const *ch, std::ostream &stream = std::cout) {
+  stream << ch << std::endl;
 }
 
 #endif
