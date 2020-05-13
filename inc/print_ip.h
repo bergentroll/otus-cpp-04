@@ -6,23 +6,49 @@
 #include <list>
 #include <tuple>
 
-std::string to_string(std::string const &s) {
-  return s;
-}
-
+/** @brief Wrapper function to make string.
+ *  Function needs to uniformely get string from various types.
+ *  @param t Any object that can be converted with std::string.
+ *  @return String made from arg..
+ */
 template <typename T>
 std::string to_string(T t) {
   return std::to_string(t);
 }
 
+/** @brief Wrapper function to make string.
+ *  Function needs to uniformely get string from various types.
+ *  @param ch Any char.
+ *  @return String containing given symbol.
+ */
 std::string to_string(char ch) {
   return to_string(static_cast<unsigned char>(ch));
 }
 
+/** @brief Wrapper function to make string.
+ *  Function needs to uniformely get string from various types.
+ *  @param ch C-style string.
+ *  @return std::string constructed from given C-string.
+ */
 std::string to_string(const char *ch) {
   return std::string(ch);
 }
 
+/** @brief Wrapper function to make string.
+ *  Function needs to uniformely get string from various types.
+ *  @param s Regular std::string.
+ *  @return Copy of input string.
+ */
+std::string to_string(std::string const &s) {
+  return s;
+}
+
+/** @brief Pretty print IP address.
+ *  Overload print integer-valued data as a dot-separated IP address. Octets is
+ *  bytes of given value.
+ *  @param t Integer-valued data.
+ *  @param stream Output stream to push in.
+ */
 template <typename T>
 void print_ip(T t, std::ostream &stream = std::cout) {
   constexpr size_t type_size { sizeof(T) };
@@ -41,6 +67,14 @@ void print_ip(T t, std::ostream &stream = std::cout) {
   stream << std::endl;
 }
 
+/** @brief Pretty print IP address.
+ *  Print STL-style container as a dot-separated IP address. Every item is an
+ *  octet.
+ *  @param Container STL-style container taken items type and allocator type as
+ *  first two template parameters. Items can have primitive numeric, C-style or
+ *  std::string type.
+ *  @param stream Output stream to push in.
+ */
 template <
   template<typename, typename> typename Container,
   typename T, 
@@ -55,6 +89,12 @@ void print_ip(Container<T, Alloc> const &t, std::ostream &stream = std::cout) {
   stream << std::endl;
 }
 
+/** @brief Pretty print IP address.
+ *  Print pair as a dot-separated IP address.
+ *  @param t Tuple of two same typed items.
+ *  @param stream Output stream to push in.
+ *  @throw static_assert When items of tuple is not same typed.
+ */
 template <typename T1, typename T2>
 void print_ip(std::tuple<T1, T2> const &t, std::ostream &stream = std::cout) {
   static_assert(std::is_same<T1, T2>());
@@ -63,6 +103,12 @@ void print_ip(std::tuple<T1, T2> const &t, std::ostream &stream = std::cout) {
     << to_string(std::get<1>(t)) << std::endl;
 }
 
+/** @brief Pretty print IP address.
+ *  Print tuple as a dot-separated IP address.
+ *  @param t Tuple of same typed items.
+ *  @param stream Output stream to push in.
+ *  @throw static_assert When items of tuple is not same typed.
+ */
 template <typename Head, typename ... Tail>
 void print_ip(std::tuple<Head, Tail ...> const &t, std::ostream &stream = std::cout) {
   using Second = typename std::tuple_element<0, std::tuple<Tail ...> >::type;
@@ -74,10 +120,20 @@ void print_ip(std::tuple<Head, Tail ...> const &t, std::ostream &stream = std::c
     }, t);
 }
 
+/** @brief Pretty print IP address.
+ *  Print string as is.
+ *  @param s std::string to be printed.
+ *  @param stream Output stream to push in.
+ */
 void print_ip(std::string s, std::ostream &stream = std::cout) {
   stream << s << std::endl;
 }
 
+/** @brief Pretty print IP address.
+ *  Print string as is.
+ *  @param ch C-style string to be printed.
+ *  @param stream Output stream to push in.
+ */
 void print_ip(char const *ch, std::ostream &stream = std::cout) {
   stream << ch << std::endl;
 }

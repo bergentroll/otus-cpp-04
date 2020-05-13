@@ -9,13 +9,19 @@ project(print_ip VERSION ${VERSION})
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(GTEST_SRCDIR "/usr/src/gtest/")
+### Dependencies ##############################################################
 
+set(GTEST_SRCDIR "/usr/src/gtest/")
 set(SRC_PATH "src/")
 set(TEST_PATH "test/")
 include_directories("inc/")
+find_package(Doxygen COMPONENTS dot)
+
+### Main targets ##############################################################
 
 add_executable(print_ip ${SRC_PATH}/main.cpp)
+
+### Tests #####################################################################
 
 if(EXISTS "${GTEST_SRCDIR}/CMakeLists.txt")
   add_subdirectory(${GTEST_SRCDIR}/ ${CMAKE_BINARY_DIR}/gtest/ EXCLUDE_FROM_ALL)
@@ -58,6 +64,22 @@ set_tests_properties(
   PROPERTIES WILL_FAIL TRUE)
 
 enable_testing()
+
+### Documentation #############################################################
+
+if(DOXYGEN_FOUND)
+  configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in
+    ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    @ONLY)
+  add_custom_target(
+    html
+    ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    COMMENT "Creating HTML documentation with Doxygen" VERBATIM)
+endif()
+
+### Packing ###################################################################
 
 install(TARGETS print_ip RUNTIME DESTINATION bin)
 

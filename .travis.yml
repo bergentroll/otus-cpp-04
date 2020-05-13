@@ -16,6 +16,7 @@ script:
 - cmake --build .
 - cmake --build . --target test
 - cmake --build . --target package
+- cmake --build . --target html
 
 deploy:
   provider: bintray
