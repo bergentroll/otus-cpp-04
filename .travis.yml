@@ -21,8 +21,14 @@ script:
 - cmake --build . --target html
 
 deploy:
-  provider: bintray
-  file: bintray.json
-  user: bergentroll
-  cleanup: false
-  edge: true
+  - provider: bintray
+    skip_cleanup: true
+    file: bintray.json
+    user: bergentroll
+    edge: true
+  - provider: pages
+    skip_cleanup: true
+    keep_history: false
+    local_dir: html
+    on:
+      branch: pages
