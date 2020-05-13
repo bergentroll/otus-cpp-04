@@ -26,9 +26,11 @@ deploy:
     file: bintray.json
     user: bergentroll
     edge: true
+    on:
+      branch: master
   - provider: pages
     skip_cleanup: true
     keep_history: false
     local_dir: html
     on:
-      branch: pages
+      branch: master
