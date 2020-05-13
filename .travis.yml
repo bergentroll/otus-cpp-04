@@ -29,6 +29,7 @@ deploy:
     on:
       branch: master
   - provider: pages
+    github_token: ${GITHUB_TOKEN}
     skip_cleanup: true
     keep_history: false
     local_dir: html
