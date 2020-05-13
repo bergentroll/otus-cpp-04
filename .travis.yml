@@ -9,6 +9,8 @@ addons:
     update: false
     packages:
     - libgtest-dev
+    - doxygen
+    - graphviz
 
 script:
 - set -e
