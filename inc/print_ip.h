@@ -96,11 +96,11 @@ void print_ip(T t, std::ostream &stream = std::cout) {
  *  @param stream Output stream to push in.
  */
 template <
-  typename Container,
+  typename T,
   std::enable_if_t<
-    is_iterable_v<Container> && !std::is_same_v<Container, std::string>,
+    is_iterable_v<T> && !std::is_same_v<T, std::string>,
     int> = 0>
-void print_ip(Container const &t, std::ostream &stream = std::cout) {
+void print_ip(T const &t, std::ostream &stream = std::cout) {
   auto begin { t.cbegin() };
   auto end { t.cend() };
   for (auto it { begin }; it != end; it++) {
@@ -158,8 +158,11 @@ void print_ip(T t, std::ostream &stream = std::cout) {
  *  @param ch C-style string to be printed.
  *  @param stream Output stream to push in.
  */
-void print_ip(char const *ch, std::ostream &stream = std::cout) {
-  stream << ch << std::endl;
+template <
+  typename T,
+  std::enable_if_t<std::is_same_v<T, const char*>, int> = 0>
+void print_ip(T t, std::ostream &stream = std::cout) {
+  stream << t << std::endl;
 }
 
 #endif
