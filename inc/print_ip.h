@@ -2,9 +2,10 @@
 #define PRINT_IP_H
 
 #include <iostream>
-#include <vector>
 #include <list>
 #include <tuple>
+#include <type_traits>
+#include <vector>
 
 /** @brief Wrapper function to make string.
  *  Function needs to uniformely get string from various types.
@@ -43,13 +44,32 @@ std::string to_string(std::string const &s) {
   return s;
 }
 
+/// @todo
+template <typename T, typename = void>
+struct is_iterable: std::false_type {};
+
+/// @todo
+template <typename T>
+struct is_iterable<
+  T,
+  std::void_t<
+    typename T::iterator,
+    decltype(std::declval<T>().begin()),
+    decltype(std::declval<T>().end())
+    >>: public std::true_type {};
+
+template <typename T>
+constexpr bool is_iterable_v { is_iterable<T>::value };
+
 /** @brief Pretty print IP address.
  *  Overload print integer-valued data as a dot-separated IP address. Octets is
  *  bytes of given value.
  *  @param t Integer-valued data.
  *  @param stream Output stream to push in.
  */
-template <typename T>
+template <
+  typename T,
+  std::enable_if_t<std::is_integral_v<T>, int> = 0>
 void print_ip(T t, std::ostream &stream = std::cout) {
   constexpr size_t type_size { sizeof(T) };
 
@@ -76,10 +96,11 @@ void print_ip(T t, std::ostream &stream = std::cout) {
  *  @param stream Output stream to push in.
  */
 template <
-  template<typename, typename> typename Container,
-  typename T, 
-  typename Alloc>
-void print_ip(Container<T, Alloc> const &t, std::ostream &stream = std::cout) {
+  typename Container,
+  std::enable_if_t<
+    is_iterable_v<Container> && !std::is_same_v<Container, std::string>,
+    int> = 0>
+void print_ip(Container const &t, std::ostream &stream = std::cout) {
   auto begin { t.cbegin() };
   auto end { t.cend() };
   for (auto it { begin }; it != end; it++) {
@@ -125,8 +146,11 @@ void print_ip(std::tuple<Head, Tail ...> const &t, std::ostream &stream = std::c
  *  @param s std::string to be printed.
  *  @param stream Output stream to push in.
  */
-void print_ip(std::string s, std::ostream &stream = std::cout) {
-  stream << s << std::endl;
+template <
+  typename T,
+  std::enable_if_t<std::is_same_v<T, std::string>, int> = 0>
+void print_ip(T t, std::ostream &stream = std::cout) {
+  stream << t << std::endl;
 }
 
 /** @brief Pretty print IP address.
