@@ -3,101 +3,16 @@
 
 #include <iostream>
 #include <list>
+#include <string>
 #include <tuple>
 #include <type_traits>
 #include <vector>
 
-/** @brief Wrapper function to make string.
- *  Function needs to uniformely get string from various types.
- *  @param t Any object that can be converted with std::string.
- *  @return String made from arg..
- */
-template <typename T>
-std::string to_string(T t) {
-  return std::to_string(t);
-}
-
-/** @brief Wrapper function to make string.
- *  Function needs to uniformely get string from various types.
- *  @param ch Any char.
- *  @return String containing given symbol.
- */
-std::string to_string(char ch) {
-  return to_string(static_cast<unsigned char>(ch));
-}
-
-/** @brief Wrapper function to make string.
- *  Function needs to uniformely get string from various types.
- *  @param ch C-style string.
- *  @return std::string constructed from given C-string.
- */
-std::string to_string(const char *ch) {
-  return std::string(ch);
-}
-
-/** @brief Wrapper function to make string.
- *  Function needs to uniformely get string from various types.
- *  @param s Regular std::string.
- *  @return Copy of input string.
- */
-std::string to_string(std::string const &s) {
-  return s;
-}
+#include "helpers.h"
+#include "traits.h"
 
 /** @brief Pretty print IP address.
- *  Print pair as a dot-separated IP address.
- *  @param t Tuple of two same typed items.
- *  @param stream Output stream to push in.
- *  @throw static_assert When items of tuple is not same typed.
- */
-template <typename T1, typename T2>
-void print_ip_tuple_impl(std::tuple<T1, T2> const &t, std::ostream &stream = std::cout) {
-  static_assert(std::is_same<T1, T2>());
-  stream
-    << to_string(std::get<0>(t)) << '.'
-    << to_string(std::get<1>(t)) << std::endl;
-}
-
-template <typename Head, typename ... Tail>
-void print_ip_tuple_impl(std::tuple<Head, Tail ...> const &t, std::ostream &stream = std::cout) {
-  using Second = typename std::tuple_element<0, std::tuple<Tail ...> >::type;
-  static_assert(std::is_same<Head, Second>());
-  stream << to_string(std::get<0>(t)) << '.';
-  std::apply(
-    [&stream](auto head, auto ... tail) {
-      print_ip_tuple_impl(std::make_tuple(tail...), stream);
-    }, t);
-}
-
-/// @todo
-template <typename T, typename = void>
-struct is_iterable: std::false_type { };
-
-/// @todo
-template <typename T>
-struct is_iterable<
-  T,
-  std::void_t<
-    typename T::iterator,
-    decltype(std::declval<T>().begin()),
-    decltype(std::declval<T>().end())
-    >>: public std::true_type {};
-
-template <typename T>
-constexpr bool is_iterable_v { is_iterable<T>::value };
-
-// Attribution to https://stackoverflow.com/a/11251408/7486328.
-/// @todo
-template <template <typename ...> class Template, typename = void>
-struct is_specialisation_of: std::false_type { };
-
-template <template <typename ...> class Template, typename ... Args>
-struct is_specialisation_of<Template, Template<Args...>>: std::true_type { };
-
-template <template <typename ...> class Template, typename T>
-constexpr bool is_specialisation_of_v { is_specialisation_of<Template, T>::value };
-
-/** @brief Pretty print IP address.
+ *
  *  Overload print integer-valued data as a dot-separated IP address. Octets is
  *  bytes of given value.
  *  @param t Integer-valued data.
@@ -124,11 +39,11 @@ void print_ip(T t, std::ostream &stream = std::cout) {
 }
 
 /** @brief Pretty print IP address.
+ *
  *  Print STL-style container as a dot-separated IP address. Every item is an
  *  octet.
- *  @param Container STL-style container taken items type and allocator type as
- *  first two template parameters. Items can have primitive numeric, C-style or
- *  std::string type.
+ *  @param t Iterable with T:begin(), T::end() container. Items can have
+ *  primitive numeric, C-style or std::string type.
  *  @param stream Output stream to push in.
  */
 template <
@@ -147,24 +62,27 @@ void print_ip(T const &t, std::ostream &stream = std::cout) {
 }
 
 /** @brief Pretty print IP address.
+ *
  *  Print tuple as a dot-separated IP address.
  *  @param t Tuple of same typed items.
  *  @param stream Output stream to push in.
  *  @throw static_assert When items of tuple is not same typed.
  *  @todo Ref.
+ *  @todo Throw.
  */
 template <
   typename T,
   std::enable_if_t<is_specialisation_of_v<std::tuple, T>, int> = 0,
-  typename = std::add_rvalue_reference<T>>
+  typename = std::add_lvalue_reference<T>>
 void print_ip(T t, std::ostream &stream = std::cout) {
   //static_assert(std::is_reference<T>());
   print_ip_tuple_impl(t, stream);
 }
 
 /** @brief Pretty print IP address.
+ *
  *  Print string as is.
- *  @param s std::string to be printed.
+ *  @param t std::string to be printed.
  *  @param stream Output stream to push in.
  */
 template <
@@ -175,8 +93,9 @@ void print_ip(T t, std::ostream &stream = std::cout) {
 }
 
 /** @brief Pretty print IP address.
+ *
  *  Print string as is.
- *  @param ch C-style string to be printed.
+ *  @param t C-style string to be printed.
  *  @param stream Output stream to push in.
  */
 template <
