@@ -44,9 +44,34 @@ std::string to_string(std::string const &s) {
   return s;
 }
 
+/** @brief Pretty print IP address.
+ *  Print pair as a dot-separated IP address.
+ *  @param t Tuple of two same typed items.
+ *  @param stream Output stream to push in.
+ *  @throw static_assert When items of tuple is not same typed.
+ */
+template <typename T1, typename T2>
+void print_ip_tuple_impl(std::tuple<T1, T2> const &t, std::ostream &stream = std::cout) {
+  static_assert(std::is_same<T1, T2>());
+  stream
+    << to_string(std::get<0>(t)) << '.'
+    << to_string(std::get<1>(t)) << std::endl;
+}
+
+template <typename Head, typename ... Tail>
+void print_ip_tuple_impl(std::tuple<Head, Tail ...> const &t, std::ostream &stream = std::cout) {
+  using Second = typename std::tuple_element<0, std::tuple<Tail ...> >::type;
+  static_assert(std::is_same<Head, Second>());
+  stream << to_string(std::get<0>(t)) << '.';
+  std::apply(
+    [&stream](auto head, auto ... tail) {
+      print_ip_tuple_impl(std::make_tuple(tail...), stream);
+    }, t);
+}
+
 /// @todo
 template <typename T, typename = void>
-struct is_iterable: std::false_type {};
+struct is_iterable: std::false_type { };
 
 /// @todo
 template <typename T>
@@ -60,6 +85,17 @@ struct is_iterable<
 
 template <typename T>
 constexpr bool is_iterable_v { is_iterable<T>::value };
+
+// Attribution to https://stackoverflow.com/a/11251408/7486328.
+/// @todo
+template <template <typename ...> class Template, typename = void>
+struct is_specialisation_of: std::false_type { };
+
+template <template <typename ...> class Template, typename ... Args>
+struct is_specialisation_of<Template, Template<Args...>>: std::true_type { };
+
+template <template <typename ...> class Template, typename T>
+constexpr bool is_specialisation_of_v { is_specialisation_of<Template, T>::value };
 
 /** @brief Pretty print IP address.
  *  Overload print integer-valued data as a dot-separated IP address. Octets is
@@ -111,34 +147,19 @@ void print_ip(T const &t, std::ostream &stream = std::cout) {
 }
 
 /** @brief Pretty print IP address.
- *  Print pair as a dot-separated IP address.
- *  @param t Tuple of two same typed items.
- *  @param stream Output stream to push in.
- *  @throw static_assert When items of tuple is not same typed.
- */
-template <typename T1, typename T2>
-void print_ip(std::tuple<T1, T2> const &t, std::ostream &stream = std::cout) {
-  static_assert(std::is_same<T1, T2>());
-  stream
-    << to_string(std::get<0>(t)) << '.'
-    << to_string(std::get<1>(t)) << std::endl;
-}
-
-/** @brief Pretty print IP address.
  *  Print tuple as a dot-separated IP address.
  *  @param t Tuple of same typed items.
  *  @param stream Output stream to push in.
  *  @throw static_assert When items of tuple is not same typed.
+ *  @todo Ref.
  */
-template <typename Head, typename ... Tail>
-void print_ip(std::tuple<Head, Tail ...> const &t, std::ostream &stream = std::cout) {
-  using Second = typename std::tuple_element<0, std::tuple<Tail ...> >::type;
-  static_assert(std::is_same<Head, Second>());
-  stream << to_string(std::get<0>(t)) << '.';
-  std::apply(
-    [&stream](auto head, auto ... tail) {
-      print_ip(std::make_tuple(tail...), stream);
-    }, t);
+template <
+  typename T,
+  std::enable_if_t<is_specialisation_of_v<std::tuple, T>, int> = 0,
+  typename = std::add_rvalue_reference<T>>
+void print_ip(T t, std::ostream &stream = std::cout) {
+  //static_assert(std::is_reference<T>());
+  print_ip_tuple_impl(t, stream);
 }
 
 /** @brief Pretty print IP address.
