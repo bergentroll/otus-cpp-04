@@ -72,10 +72,8 @@ void print_ip(T const &t, std::ostream &stream = std::cout) {
  */
 template <
   typename T,
-  std::enable_if_t<is_specialisation_of_v<std::tuple, T>, int> = 0,
-  typename = std::add_lvalue_reference<T>>
-void print_ip(T t, std::ostream &stream = std::cout) {
-  //static_assert(std::is_reference<T>());
+  std::enable_if_t<is_specialisation_of_v<std::tuple, T>, int> = 0>
+void print_ip(T const &t, std::ostream &stream = std::cout) {
   print_ip_tuple_impl(t, stream);
 }
 
@@ -88,7 +86,7 @@ void print_ip(T t, std::ostream &stream = std::cout) {
 template <
   typename T,
   std::enable_if_t<std::is_same_v<T, std::string>, int> = 0>
-void print_ip(T t, std::ostream &stream = std::cout) {
+void print_ip(T const &t, std::ostream &stream = std::cout) {
   stream << t << std::endl;
 }
 
